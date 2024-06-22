@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>로또 1등 당첨 숫자 횟수 분석</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="lottery_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lottery_files/libs/quarto-html/quarto.js"></script>
+<script src="lottery_files/libs/quarto-html/popper.min.js"></script>
+<script src="lottery_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lottery_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lottery_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lottery_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lottery_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lottery_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lottery_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">로또 1등 당첨 숫자 횟수 분석</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="로또-기관" class="level2">
+<h2 class="anchored" data-anchor-id="로또-기관">로또 기관</h2>
+<p><img src="data:image/png;base64,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.png" class="img-fluid" style="float:middle;" width="300"></p>
+</section>
+<section id="숫자-별-당첨-횟수-분석-그래프" class="level2">
+<h2 class="anchored" data-anchor-id="숫자-별-당첨-횟수-분석-그래프">숫자 별 당첨 횟수 분석 그래프</h2>
+<p>1100회에서 1124회까지 크롤링을 통해 당첨 데이터 수집 =&gt; 크롤링 후 각 숫자 별 당첨 횟수를 그래프로 나타냄</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="lottery_files/figure-html/lottery-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
